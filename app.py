@@ -121,3 +121,65 @@ def draw_weighted(weights, count=PICK_COUNT):
         pool.remove(selected) 
  
     return sorted(chosen, key=lambda item: item[0])
+
+# --------------------------------------------------------------------- 
+# Reporting 
+# --------------------------------------------------------------------- 
+ 
+def report_header(): 
+    print("=" * 60) 
+    print("AI Lotto Smart App") 
+    print("Statistical analysis and weighted number generation") 
+    print("=" * 60) 
+ 
+ 
+def report_data_range(df): 
+    start = df["date"].min().date() 
+    end = df["date"].max().date() 
+    print() 
+    print("Draws loaded :", len(df)) 
+    print("Date range   :", start, "to", end) 
+ 
+ 
+def report_frequency(freq, overdue): 
+    hot, cold = rank_numbers(freq, top=5) 
+    most_overdue = sorted(overdue.items(), key=lambda item: item[1], reverse=True)[:5] 
+ 
+    print() 
+    print("Frequency analysis (numbers 1 to 50)") 
+    print("  Most frequent :", ", ".join(f"{n} ({c}x)" for n, c in hot)) 
+    print("  Least frequent:", ", ".join(f"{n} ({c}x)" for n, c in cold)) 
+    print("  Most overdue  :", ", ".join(f"{n} ({d} draws)" for n, d in most_overdue)) 
+ 
+ 
+ 
+def report_sets(weights, num_sets=NUM_SETS, count=PICK_COUNT): 
+    print() 
+    print("Generated sets") 
+ 
+    first_set = None 
+    for i in range(num_sets): 
+        picks = draw_weighted(weights, count=count) 
+        if i == 0: 
+            first_set = picks 
+ 
+        numbers = [item[0] for item in picks] 
+        odds = sum(1 for n in numbers if n % 2 == 1) 
+        evens = len(numbers) - odds 
+        line = "  ".join(f"{n:2d}" for n in numbers) 
+        print(f"  Set {i + 1}: {line}   (odd/even: {odds}/{evens})") 
+ 
+    print() 
+    print("Selection detail for Set 1") 
+    for number, weight, appearances, draws_since in first_set: 
+        print( 
+            f"  {number:2d}  appearances={appearances}  " 
+            f"draws_since_last={draws_since}  weight={weight:.2f}" 
+        ) 
+ 
+ 
+def report_footer(): 
+    print() 
+    print("-" * 60) 
+    print("This output is a weighted heuristic, not a prediction.") 
+    print("Lottery draws are independent random events.")
