@@ -79,3 +79,45 @@ def rank_numbers(freq, top=5):
     hot = ordered[:top] 
     cold = ordered[-top:] 
     return hot, cold
+
+# --------------------------------------------------------------------- 
+# Weighting and generation 
+# --------------------------------------------------------------------- 
+ 
+def build_weights(freq, overdue, max_number=MAX_NUMBER, bonus=OVERDUE_BONUS): 
+    """ 
+    Assign each number a selection weight. 
+ 
+    weight = appearances + (draws_since_last_seen * bonus) + base 
+    """ 
+    weights = [] 
+    for n in range(1, max_number + 1): 
+        appearances = freq.get(n, 0) 
+        draws_since = overdue.get(n, 0) 
+        weight = appearances + draws_since * bonus + 0.1 
+        weights.append((n, weight, appearances, draws_since)) 
+    return weights 
+ 
+ 
+def draw_weighted(weights, count=PICK_COUNT): 
+ 
+    """Select unique numbers using weighted sampling without replacement.""" 
+    pool = list(weights) 
+    chosen = [] 
+ 
+    while len(chosen) < count and pool: 
+        total = sum(w for _, w, _, _ in pool) 
+        threshold = random.random() * total 
+        running = 0.0 
+        selected = pool[0] 
+ 
+        for item in pool: 
+            running += item[1] 
+            if threshold <= running: 
+                selected = item 
+                break 
+ 
+        chosen.append(selected) 
+        pool.remove(selected) 
+ 
+    return sorted(chosen, key=lambda item: item[0])
