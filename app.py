@@ -183,3 +183,35 @@ def report_footer():
     print("-" * 60) 
     print("This output is a weighted heuristic, not a prediction.") 
     print("Lottery draws are independent random events.")
+
+# --------------------------------------------------------------------- 
+# Entry point 
+# --------------------------------------------------------------------- 
+ 
+def main(): 
+    report_header() 
+ 
+    try: 
+        df = load_data(DATA_FILE) 
+    except FileNotFoundError: 
+        print() 
+        print(f"Error: {DATA_FILE} not found in the current directory.") 
+        return 
+    except ValueError as err: 
+        print() 
+        print(f"Error: {err}") 
+ 
+        return 
+ 
+    freq = compute_frequency(df) 
+    overdue = compute_overdue(df) 
+    weights = build_weights(freq, overdue) 
+ 
+    report_data_range(df) 
+    report_frequency(freq, overdue) 
+    report_sets(weights) 
+    report_footer() 
+ 
+ 
+if __name__ == "__main__": 
+    main()
